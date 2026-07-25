@@ -1,4 +1,4 @@
-package com.NMolina.to_do_list_TT.domain.port.in.TaskUseCase;
+package com.NMolina.to_do_list_TT.domain.port.in.task;
 
 import java.time.LocalDate;
 

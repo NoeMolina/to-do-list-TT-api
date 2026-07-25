@@ -68,4 +68,11 @@ public class TareaRepositoryAdapter implements TaskRepositoryPort {
     public void deleteById(Long id) {
         tareaJpaRepository.deleteById(id);
     }
+
+    @Override
+    public List<Task> findAll() {
+        return tareaJpaRepository.findAll().stream()
+                .map(mapper::toDomain)
+                .toList();
+    }
 }

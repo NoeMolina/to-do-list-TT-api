@@ -9,27 +9,29 @@ public class User {
     private String username;
     private String passwordHash;
     private boolean active;
+    private Role role;
 
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private Long createdBy;
     private Long updatedBy;
 
-    public User(Long id, String username, String passwordHash, boolean active,
+    public User(Long id, String username, String passwordHash, boolean active, Role role,
             LocalDateTime createdAt, LocalDateTime updatedAt,
             Long createdBy, Long updatedBy) {
         this.id = id;
         this.username = validateUsername(username);
         this.passwordHash = Objects.requireNonNull(passwordHash, "passwordHash no puede ser nulo");
         this.active = active;
+        this.role = Objects.requireNonNull(role, "rol no puede ser nulo");
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
         this.createdBy = createdBy;
         this.updatedBy = updatedBy;
     }
 
-    public static User register(String username, String passwordHash) {
-        return new User(null, username, passwordHash, true, null, null, null, null);
+    public static User register(String username, String passwordHash, Role role) {
+        return new User(null, username, passwordHash, true, role, null, null, null, null);
     }
 
     private String validateUsername(String username) {
@@ -54,6 +56,8 @@ public class User {
         this.passwordHash = Objects.requireNonNull(newPasswordHash, "passwordHash no puede ser nulo");
     }
 
+    public boolean isAdmin() {return role.isAdmin();}
+
     public Long getId() {
         return id;
     }
@@ -68,6 +72,10 @@ public class User {
 
     public boolean isActive() {
         return active;
+    }
+
+    public Role getRole() {
+        return role;
     }
 
     public LocalDateTime getCreatedAt() {

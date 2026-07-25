@@ -6,24 +6,31 @@ import org.springframework.stereotype.Component;
 
 import com.NMolina.to_do_list_TT.domain.model.User;
 import com.NMolina.to_do_list_TT.domain.port.out.UserRepositoryPort;
+import com.NMolina.to_do_list_TT.infrastructure.adapter.out.persistence.entity.RoleEntity;
 import com.NMolina.to_do_list_TT.infrastructure.adapter.out.persistence.entity.UsuarioEntity;
 import com.NMolina.to_do_list_TT.infrastructure.adapter.out.persistence.mapper.UsuarioPersistenceMapper;
+import com.NMolina.to_do_list_TT.infrastructure.adapter.out.persistence.repository.RoleJpaRepository;
 import com.NMolina.to_do_list_TT.infrastructure.adapter.out.persistence.repository.UsuarioJpaRepository;
 
 @Component
 public class UsuarioRepositoryAdapter implements UserRepositoryPort {
 
     private final UsuarioJpaRepository jpaRepository;
+    private final RoleJpaRepository roleJpaRepository;
     private final UsuarioPersistenceMapper mapper;
 
-    public UsuarioRepositoryAdapter(UsuarioJpaRepository jpaRepository, UsuarioPersistenceMapper mapper) {
+    public UsuarioRepositoryAdapter(UsuarioJpaRepository jpaRepository, RoleJpaRepository roleJpaRepository,
+            UsuarioPersistenceMapper mapper) {
         this.jpaRepository = jpaRepository;
+        this.roleJpaRepository = roleJpaRepository;
         this.mapper = mapper;
     }
 
     @Override
     public User save(User user) {
-        UsuarioEntity entity = mapper.toEntity(user);
+        RoleEntity rol = roleJpaRepository.findByCodigo(user.getRole().getCode())
+                .orElseThrow(() -> new IllegalStateException("Rol no encontrado"));
+        UsuarioEntity entity = mapper.toEntity(user, rol);
         UsuarioEntity saved = jpaRepository.save(entity);
         return mapper.toDomain(saved);
     }

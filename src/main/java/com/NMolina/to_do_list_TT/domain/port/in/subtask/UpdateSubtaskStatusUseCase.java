@@ -1,4 +1,4 @@
-package com.NMolina.to_do_list_TT.domain.port.in.SubtaskUseCase;
+package com.NMolina.to_do_list_TT.domain.port.in.subtask;
 
 import com.NMolina.to_do_list_TT.domain.model.Subtask;
 

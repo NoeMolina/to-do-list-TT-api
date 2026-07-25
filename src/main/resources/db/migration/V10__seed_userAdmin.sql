@@ -1,0 +1,1 @@
+INSERT INTO public.usuarios (username, password_hash, activo, created_at, updated_at, created_by, updated_by, rol_id) VALUES('admin', '$2a$10$I.qaW4TS5mZL8iw.3NB8R.TrX8.w6eJfUCRIwIvw6uHEvZ.sugYSu', true, '2026-07-24 22:14:51.494', '2026-07-24 22:14:51.494', NULL, NULL, 1);

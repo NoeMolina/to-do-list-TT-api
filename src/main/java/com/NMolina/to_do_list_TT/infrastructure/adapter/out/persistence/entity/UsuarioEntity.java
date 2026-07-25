@@ -2,9 +2,12 @@ package com.NMolina.to_do_list_TT.infrastructure.adapter.out.persistence.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 @Entity
@@ -24,14 +27,19 @@ public class UsuarioEntity extends Auditable {
     @Column(name = "activo", nullable = false)
     private boolean activo;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "rol_id", nullable = false)
+    private RoleEntity rol;
+
     protected UsuarioEntity() {
     }
 
-    public UsuarioEntity(Long id, String username, String passwordHash, boolean activo) {
+    public UsuarioEntity(Long id, String username, String passwordHash, boolean activo, RoleEntity rol) {
         this.id = id;
         this.username = username;
         this.passwordHash = passwordHash;
         this.activo = activo;
+        this.rol = rol;
     }
 
     public Long getId() {
@@ -48,6 +56,10 @@ public class UsuarioEntity extends Auditable {
 
     public boolean isActivo() {
         return activo;
+    }
+
+    public RoleEntity getRol() {
+        return rol;
     }
 
     public void setUsername(String username) {

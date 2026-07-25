@@ -1,20 +1,10 @@
 package com.NMolina.to_do_list_TT.domain.model;
 
-import com.NMolina.to_do_list_TT.domain.exception.InvalidStatusTransitionException;
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 public class Task {
-
-    private static final Map<String, List<String>> VALID_TRANSITIONS = Map.of(
-            "PENDIENTE", List.of("EN_PROGRESO", "CANCELADO"),
-            "EN_PROGRESO", List.of("COMPLETADO", "CANCELADO", "PENDIENTE"),
-            "COMPLETADO", List.of(),
-            "CANCELADO", List.of());
 
     private Long id;
     private String title;
@@ -67,11 +57,7 @@ public class Task {
     }
 
     public void changeStatus(Status newStatus) {
-        List<String> allowed = VALID_TRANSITIONS.get(this.status.getCode());
-        if (allowed == null || !allowed.contains(newStatus.getCode())) {
-            throw new InvalidStatusTransitionException(
-                    this.status.getCode(), newStatus.getCode());
-        }
+        TaskLifecycle.validateTransition(this.status, newStatus);
         this.status = newStatus;
     }
 

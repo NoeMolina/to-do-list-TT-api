@@ -12,5 +12,7 @@ public interface TaskRepositoryPort {
 
     List<Task> findAllByUserId(Long userId);
 
+    List<Task> findAll();
+
     void deleteById(Long id);
 }

@@ -1,4 +1,4 @@
-package com.NMolina.to_do_list_TT.domain.port.in.UserUseCase;
+package com.NMolina.to_do_list_TT.domain.port.in.user;
 
 public interface AuthenticateUserUseCase {
 
