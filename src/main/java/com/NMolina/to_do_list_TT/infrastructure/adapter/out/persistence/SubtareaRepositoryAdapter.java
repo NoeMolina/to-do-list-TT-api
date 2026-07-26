@@ -1,6 +1,8 @@
 package com.NMolina.to_do_list_TT.infrastructure.adapter.out.persistence;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.stereotype.Component;
@@ -42,6 +44,31 @@ public class SubtareaRepositoryAdapter implements SubtaskRepositoryPort {
         SubtareaEntity entity = mapper.toEntity(subtask, tarea, estatus);
         SubtareaEntity saved = subtareaJpaRepository.save(entity);
         return mapper.toDomain(saved);
+    }
+
+    @Override
+    public List<Subtask> saveAll(List<Subtask> subtasks) {
+        if (subtasks.isEmpty())
+            return List.of();
+
+        Map<Long, TareaEntity> tareaCache = new HashMap<>();
+        Map<Integer, EstatusEntity> estatusCache = new HashMap<>();
+
+        List<SubtareaEntity> entities = subtasks.stream()
+                .map(subtask -> {
+                    TareaEntity tarea = tareaCache.computeIfAbsent(subtask.getTaskId(),
+                            id -> tareaJpaRepository.findById(id)
+                                    .orElseThrow(() -> new IllegalStateException("Tarea no encontrada")));
+                    EstatusEntity estatus = estatusCache.computeIfAbsent(subtask.getStatus().getId(),
+                            id -> estatusJpaRepository.findById(id)
+                                    .orElseThrow(() -> new IllegalStateException("Estatus no encontrado")));
+                    return mapper.toEntity(subtask, tarea, estatus);
+                })
+                .toList();
+
+        return subtareaJpaRepository.saveAll(entities).stream()
+                .map(mapper::toDomain)
+                .toList();
     }
 
     @Override

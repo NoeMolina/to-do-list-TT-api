@@ -1,8 +1,12 @@
 package com.NMolina.to_do_list_TT.infrastructure.adapter.in.web.controller;
 
+import java.util.List;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -12,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.NMolina.to_do_list_TT.domain.model.Subtask;
 import com.NMolina.to_do_list_TT.domain.port.in.subtask.CreateSubtaskUseCase;
+import com.NMolina.to_do_list_TT.domain.port.in.subtask.ListSubtasksUseCase;
 import com.NMolina.to_do_list_TT.domain.port.in.subtask.UpdateSubtaskStatusUseCase;
 import com.NMolina.to_do_list_TT.infrastructure.adapter.in.web.dto.request.CreateSubtaskRequest;
 import com.NMolina.to_do_list_TT.infrastructure.adapter.in.web.dto.request.UpdateTaskStatusRequest;
@@ -27,13 +32,16 @@ public class SubtaskController {
 
     private final CreateSubtaskUseCase createSubtaskUseCase;
     private final UpdateSubtaskStatusUseCase updateSubtaskStatusUseCase;
+    private final ListSubtasksUseCase listSubtasksUseCase;
     private final SubtaskWebMapper mapper;
 
     public SubtaskController(CreateSubtaskUseCase createSubtaskUseCase,
             UpdateSubtaskStatusUseCase updateSubtaskStatusUseCase,
+            ListSubtasksUseCase listSubtasksUseCase,
             SubtaskWebMapper mapper) {
         this.createSubtaskUseCase = createSubtaskUseCase;
         this.updateSubtaskStatusUseCase = updateSubtaskStatusUseCase;
+        this.listSubtasksUseCase = listSubtasksUseCase;
         this.mapper = mapper;
     }
 
@@ -53,5 +61,20 @@ public class SubtaskController {
         Long currentUserId = ((UserDetailsAdapter) authentication.getPrincipal()).getUserId();
         Subtask subtask = updateSubtaskStatusUseCase.updateStatus(id, request.status(), currentUserId);
         return ResponseEntity.ok(mapper.toResponse(subtask));
+    }
+
+    @GetMapping("/task/{taskId}")
+    public ResponseEntity<List<SubtaskResponse>> listByTask(@PathVariable Long taskId,
+            Authentication authentication) {
+        Long currentUserId = ((UserDetailsAdapter) authentication.getPrincipal()).getUserId();
+        boolean isAdmin = authentication.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .anyMatch(role -> role.equals("ROLE_ADMIN"));
+
+        List<SubtaskResponse> subtasks = listSubtasksUseCase.listByTask(taskId, currentUserId, isAdmin).stream()
+                .map(mapper::toResponse)
+                .toList();
+
+        return ResponseEntity.ok(subtasks);
     }
 }

@@ -1,5 +1,7 @@
 package com.NMolina.to_do_list_TT.application.service;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -9,6 +11,7 @@ import com.NMolina.to_do_list_TT.domain.model.Status;
 import com.NMolina.to_do_list_TT.domain.model.Subtask;
 import com.NMolina.to_do_list_TT.domain.model.Task;
 import com.NMolina.to_do_list_TT.domain.port.in.subtask.CreateSubtaskUseCase;
+import com.NMolina.to_do_list_TT.domain.port.in.subtask.ListSubtasksUseCase;
 import com.NMolina.to_do_list_TT.domain.port.in.subtask.UpdateSubtaskStatusUseCase;
 import com.NMolina.to_do_list_TT.domain.port.out.StatusRepositoryPort;
 import com.NMolina.to_do_list_TT.domain.port.out.SubtaskRepositoryPort;
@@ -16,7 +19,7 @@ import com.NMolina.to_do_list_TT.domain.port.out.TaskRepositoryPort;
 
 @Service
 @Transactional
-public class SubtaskService implements CreateSubtaskUseCase, UpdateSubtaskStatusUseCase {
+public class SubtaskService implements CreateSubtaskUseCase, UpdateSubtaskStatusUseCase, ListSubtasksUseCase {
 
     private static final String DEFAULT_INITIAL_STATUS = "PENDIENTE";
 
@@ -39,7 +42,8 @@ public class SubtaskService implements CreateSubtaskUseCase, UpdateSubtaskStatus
 
         Status initialStatus = statusRepository.findByCode(DEFAULT_INITIAL_STATUS)
                 .orElseThrow(() -> new IllegalStateException(
-                        "No se encontró el estatus inicial '%s' en el catálogo".formatted(DEFAULT_INITIAL_STATUS)));
+                "No se encontró el estatus inicial '%s' en el catálogo"
+                        .formatted(DEFAULT_INITIAL_STATUS)));
 
         Subtask subtask = Subtask.create(
                 command.taskId(),
@@ -64,9 +68,23 @@ public class SubtaskService implements CreateSubtaskUseCase, UpdateSubtaskStatus
 
         Status newStatus = statusRepository.findByCode(newStatusCode)
                 .orElseThrow(() -> new IllegalArgumentException(
-                        "El estatus '%s' no existe en el catálogo".formatted(newStatusCode)));
+                "El estatus '%s' no existe en el catálogo".formatted(newStatusCode)));
 
         subtask.changeStatus(newStatus);
         return subtaskRepository.save(subtask);
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Subtask> listByTask(Long taskId, Long userId, boolean isAdmin) {
+        Task task = taskRepository.findById(taskId)
+                .orElseThrow(() -> new TaskNotFoundException(taskId));
+
+        if (!isAdmin && !task.getUserId().equals(userId)) {
+            throw new TaskNotFoundException(taskId);
+        }
+
+        return subtaskRepository.findAllByTaskId(taskId);
+    }
+
 }
