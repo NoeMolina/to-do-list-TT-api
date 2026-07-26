@@ -1,5 +1,6 @@
 package com.NMolina.to_do_list_TT.infrastructure.adapter.out.persistence;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Component;
@@ -28,5 +29,10 @@ public class EstatusRepositoryAdapter implements StatusRepositoryPort {
     @Override
     public Optional<Status> findById(Integer id) {
         return jpaRepository.findById(id).map(mapper::toDomain);
+    }
+
+    @Override
+    public List<Status> findAll() {
+        return jpaRepository.findAll().stream().map(mapper::toDomain).toList();
     }
 }
