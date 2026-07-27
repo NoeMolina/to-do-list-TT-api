@@ -1,11 +1,14 @@
 package com.NMolina.to_do_list_TT.application.service;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.NMolina.to_do_list_TT.domain.exception.DuplicateUsernameException;
 import com.NMolina.to_do_list_TT.domain.model.Role;
 import com.NMolina.to_do_list_TT.domain.model.User;
+import com.NMolina.to_do_list_TT.domain.port.in.user.ListUsersUseCase;
 import com.NMolina.to_do_list_TT.domain.port.in.user.RegisterUserUseCase;
 import com.NMolina.to_do_list_TT.domain.port.out.PasswordEncoderPort;
 import com.NMolina.to_do_list_TT.domain.port.out.RoleRepositoryPort;
@@ -13,7 +16,7 @@ import com.NMolina.to_do_list_TT.domain.port.out.UserRepositoryPort;
 
 @Service
 @Transactional
-public class UserService implements RegisterUserUseCase {
+public class UserService implements RegisterUserUseCase, ListUsersUseCase {
 
     private final UserRepositoryPort userRepository;
     private final RoleRepositoryPort roleRepository;
@@ -39,5 +42,11 @@ public class UserService implements RegisterUserUseCase {
         String hashedPassword = passwordEncoder.encode(command.rawPassword());
         User user = User.register(command.username(), hashedPassword, defaultRole);
         return userRepository.save(user);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<User> listAll() {
+        return userRepository.findAll();
     }
 }

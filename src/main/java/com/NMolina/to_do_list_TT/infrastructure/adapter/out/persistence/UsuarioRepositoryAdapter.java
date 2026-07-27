@@ -1,5 +1,6 @@
 package com.NMolina.to_do_list_TT.infrastructure.adapter.out.persistence;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Component;
@@ -48,5 +49,12 @@ public class UsuarioRepositoryAdapter implements UserRepositoryPort {
     @Override
     public boolean existsByUsername(String username) {
         return jpaRepository.existsByUsername(username);
+    }
+
+    @Override
+    public List<User> findAll() {
+        return jpaRepository.findAll().stream()
+                .map(mapper::toDomain)
+                .toList();
     }
 }

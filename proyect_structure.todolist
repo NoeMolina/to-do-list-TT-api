@@ -1,0 +1,64 @@
+com.tunombre.todolist
+│
+├── domain/                          # Núcleo — sin dependencias de frameworks
+│   ├── model/                       # Entidades de dominio (POJOs puros, sin anotaciones JPA)
+│   │   ├── Tarea.java
+│   │   ├── Subtarea.java
+│   │   ├── Usuario.java
+│   │   ├── Categoria.java
+│   │   └── Estatus.java
+│   ├── exception/                   # Excepciones de negocio
+│   │   ├── TareaNotFoundException.java
+│   │   └── EstadoInvalidoException.java
+│   └── port/
+│       ├── in/                      # Puertos de entrada (casos de uso)
+│       │   ├── CrearTareaUseCase.java
+│       │   ├── ActualizarEstatusTareaUseCase.java
+│       │   ├── ListarTareasUseCase.java
+│       │   └── ...
+│       └── out/                     # Puertos de salida (lo que el dominio necesita)
+│           ├── TareaRepositoryPort.java
+│           ├── UsuarioRepositoryPort.java
+│           └── ...
+│
+├── application/                     # Orquestación — implementa los puertos de entrada
+│   └── service/
+│       ├── TareaService.java        # implements CrearTareaUseCase, ListarTareasUseCase...
+│       ├── SubtareaService.java
+│       └── AuthService.java
+│
+├── infrastructure/                  # Adaptadores — todo lo que depende de frameworks/tech
+│   ├── adapter/
+│   │   ├── in/
+│   │   │   └── web/                 # Adaptador de entrada REST
+│   │   │       ├── controller/
+│   │   │       │   ├── TareaController.java
+│   │   │       │   ├── SubtareaController.java
+│   │   │       │   └── AuthController.java
+│   │   │       ├── dto/
+│   │   │       │   ├── request/
+│   │   │       │   └── response/
+│   │   │       └── mapper/          # DTO <-> Domain model
+│   │   │           └── TareaWebMapper.java
+│   │   └── out/
+│   │       ├── persistence/         # Adaptador de salida JPA
+│   │       │   ├── entity/          # @Entity — aquí SÍ van las anotaciones JPA
+│   │       │   │   ├── TareaEntity.java
+│   │       │   │   ├── SubtareaEntity.java
+│   │       │   │   └── UsuarioEntity.java
+│   │       │   ├── repository/      # Spring Data JPA repositories
+│   │       │   │   ├── TareaJpaRepository.java
+│   │       │   │   └── UsuarioJpaRepository.java
+│   │       │   ├── mapper/          # Entity <-> Domain model
+│   │       │   │   └── TareaPersistenceMapper.java
+│   │       │   └── TareaRepositoryAdapter.java  # implements TareaRepositoryPort
+│   │       └── security/
+│   │           ├── JwtService.java
+│   │           ├── JwtAuthenticationFilter.java
+│   │           └── UserDetailsServiceImpl.java
+│   └── config/
+│       ├── SecurityConfig.java
+│       ├── JpaAuditConfig.java
+│       └── BeanConfig.java
+│
+└── TodoListApplication.java
